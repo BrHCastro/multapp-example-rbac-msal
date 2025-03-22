@@ -2,11 +2,6 @@ import { Separator } from '@/presentation/components/ui/separator'
 import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
 
-export const metadata = {
-  title: 'External app',
-  description: 'This is an external app',
-}
-
 export default function ExternalLayout({
   children,
 }: Readonly<PropsWithChildren>) {

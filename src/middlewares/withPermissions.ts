@@ -10,25 +10,32 @@ const getUserPermission = (request: NextRequest) => {
   return userPermission
 }
 
+export const STATIC_RESOURCE_REGEX =
+  /\.(png|jpg|jpeg|webp|gif|svg|css|js|ico|woff|woff2|ttf|otf)$/i
+
 export const withPermissions: MiddlewareFactory = () => {
   return async (request: NextRequest) => {
     const url = request.nextUrl.clone()
     const userPermission = getUserPermission(request)
+    const isStaticResource = STATIC_RESOURCE_REGEX.test(url.pathname)
 
-    const [currency, locale, ...path] = url.pathname.split('/').filter(Boolean)
+    const [currency = 'br', locale = 'pt', ...path] = url.pathname
+      .split('/')
+      .filter(Boolean)
 
-    if (!currency || !locale) {
-      return NextResponse.next()
-    }
+    const langPrefix = `/${currency}/${locale}`
 
     if (userPermission) {
       if (url.pathname === '/') {
-        url.pathname = `/${currency}/${locale}/${userPermission.toLowerCase()}/home`
+        url.pathname = `${langPrefix}/${userPermission.toLowerCase()}/home`
       } else {
-        url.pathname = `/${currency}/${locale}/${userPermission.toLowerCase()}/${path}`
+        url.pathname = `${langPrefix}/${userPermission.toLowerCase()}/${path}`
       }
     } else {
-      url.pathname = '/'
+      if (!isStaticResource && !url.pathname.startsWith(`${langPrefix}`)) {
+        const absoluteUrl = `${url.origin}${langPrefix}/login`
+        return NextResponse.redirect(absoluteUrl)
+      }
     }
 
     return NextResponse.rewrite(url)
