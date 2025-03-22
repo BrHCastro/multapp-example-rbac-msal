@@ -1,7 +1,6 @@
 import { registerUserPermission } from '@/main/factories/services/actions/register-user-permission'
 import { Button } from './ui/button'
 import { RadioPermission } from './radio-permission'
-import { redirect } from 'next/navigation'
 
 export const LoginForm: React.FC = () => {
   async function registerPermission(formData: FormData) {
@@ -11,7 +10,6 @@ export const LoginForm: React.FC = () => {
     }
 
     await registerUserPermission(rawFormData.permission?.toString() ?? '')
-    redirect('/br/pt/home')
   }
 
   return (
